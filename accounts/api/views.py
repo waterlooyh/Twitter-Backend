@@ -1,7 +1,12 @@
-from accounts.api.serializers import LoginSerializer, SignupSerializer, UserSerializer
+from accounts.api.serializers import (
+    LoginSerializer,
+    SignupSerializer, 
+    UserSerializer,
+)
 from django.contrib.auth import (
-    authenticate as django_authenticate,
-    login as django_login
+    authenticate,
+    login,
+    logout,
 )
 from django.contrib.auth.models import User
 from rest_framework import permissions
@@ -33,7 +38,7 @@ class SignupViewSet(viewsets.ViewSet):
             }, status=400)
 
         user = serializer.save()
-        django_login(request, user)
+        login(request, user)
         return Response({
             'success': True,
             'user': UserSerializer(user).data,
@@ -53,13 +58,13 @@ class LoginViewSet(viewsets.ViewSet):
             }, status=400)
         username = serializer.validated_data['username']
         password = serializer.validated_data['password']
-        user = django_authenticate(username=username, password=password)
+        user = authenticate(username=username, password=password)
         if not user or user.is_anonymous:
             return Response({
                 'success': False,
                 'message': 'username and password does not match',
             }, status=400)
-        django_login(request, user)
+        login(request, user)
         return Response({
             'success': True,
             'user': UserSerializer(user).data,
@@ -71,3 +76,11 @@ class LoginViewSet(viewsets.ViewSet):
         if request.user.is_authenticated:
             data['user'] = UserSerializer(request.user).data
         return Response(data)
+
+class LogoutViewSet(viewsets.ViewSet):
+    permission_classes = (AllowAny,)
+    serializer_class = LoginSerializer
+
+    def create(self, request):
+        logout(request)
+        return Response({'success': True})
