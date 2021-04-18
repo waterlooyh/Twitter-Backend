@@ -1,4 +1,4 @@
-from accounts.api.serializers import UserSerializer, SignupSerializer
+from accounts.api.serializers import LoginSerializer, SignupSerializer, UserSerializer
 from django.contrib.auth import (
     authenticate as django_authenticate,
     login as django_login
@@ -19,12 +19,11 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-class AccountViewSet(viewsets.ViewSet):
+class SignupViewSet(viewsets.ViewSet):
     permission_classes = (AllowAny,)
     serializer_class = SignupSerializer
 
-    @action(methods=['POST'], detail=False)
-    def signup(self, request):
+    def create(self, request):
         serializer = SignupSerializer(data=request.data)
         if not serializer.is_valid():
             return Response({
@@ -33,9 +32,42 @@ class AccountViewSet(viewsets.ViewSet):
                 'errors': serializer.errors,
             }, status=400)
 
-        user=serializer.save()
+        user = serializer.save()
         django_login(request, user)
         return Response({
             'success': True,
             'user': UserSerializer(user).data,
         })
+
+class LoginViewSet(viewsets.ViewSet):
+    permission_classes = (AllowAny,)
+    serializer_class = LoginSerializer
+
+    def create(self, request):
+        serializer = LoginSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({
+                'success': False,
+                'message': 'Please check input',
+                'errors': serializer.errors,
+            }, status=400)
+        username = serializer.validated_data['username']
+        password = serializer.validated_data['password']
+        user = django_authenticate(username=username, password=password)
+        if not user or user.is_anonymous:
+            return Response({
+                'success': False,
+                'message': 'username and password does not match',
+            }, status=400)
+        django_login(request, user)
+        return Response({
+            'success': True,
+            'user': UserSerializer(user).data,
+        })
+
+    @action(methods=['GET'], detail=False)
+    def login_status(self, request):
+        data = {'has_logged_in': request.user.is_authenticated}
+        if request.user.is_authenticated:
+            data['user'] = UserSerializer(request.user).data
+        return Response(data)
