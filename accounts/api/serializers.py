@@ -28,8 +28,8 @@ class SignupSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        username = validated_data['username'].lower()
-        email = validated_data['email'].lower()
+        username = validated_data['username']
+        email = validated_data['email']
         password = validated_data['password']
 
         user = User.objects.create_user(
@@ -38,3 +38,7 @@ class SignupSerializer(serializers.ModelSerializer):
             password=password
         )
         return user
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField()
