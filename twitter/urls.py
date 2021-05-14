@@ -24,6 +24,7 @@ from accounts.api.views import (
         LogoutViewSet
 )
 from tweets.api.views import TweetViewSet
+from friendships.api.views import FriendshipViewSet
 
 router = routers.DefaultRouter()
 router.register(r'api/users', UserViewSet)
@@ -31,6 +32,7 @@ router.register(r'api/accounts/signup', SignupViewSet, basename='accounts')
 router.register(r'api/accounts/login', LoginViewSet, basename='accounts')
 router.register(r'api/accounts/logout', LogoutViewSet, basename='accounts')
 router.register(r'api/tweets', TweetViewSet, basename='tweets')
+router.register(r'api/friendships', FriendshipViewSet, basename='friendships')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
