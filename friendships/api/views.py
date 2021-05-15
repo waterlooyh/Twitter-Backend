@@ -11,11 +11,12 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
 class FriendshipViewSet(viewsets.GenericViewSet):
-    # GET /api/friendship/{}/followers/
-    # GET /api/friendship/{}/followings/
-    # POST /api/friendship/{}/follow/
-    # POST /api/friendship/{}/unfollow/
+    # GET /api/friendships/{}/followers/
+    # GET /api/friendships/{}/followings/
+    # POST /api/friendships/{}/follow/
+    # POST /api/friendships/{}/unfollow/
     queryset = User.objects.all()
+    serializer_class = FriendshipCreateSerializer
 
     @action(methods=['GET'], detail=True, permission_classes=[AllowAny])
     def followers(self, request, pk):
@@ -32,8 +33,8 @@ class FriendshipViewSet(viewsets.GenericViewSet):
     @action(methods=['POST'], detail=True, permission_classes=[IsAuthenticated])
     def follow(self, request, pk):
         if Friendship.objects.filter(
-                from_user_id=request.user.id, 
-                to_user_id=pk,
+            from_user_id=request.user.id, 
+            to_user_id=pk,
         ).exists():
             return Response({
                 'success': True,

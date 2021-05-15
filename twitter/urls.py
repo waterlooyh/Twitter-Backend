@@ -18,10 +18,10 @@ from django.urls import include, path
 from rest_framework import routers
 
 from accounts.api.views import (
-        UserViewSet, 
-        SignupViewSet, 
-        LoginViewSet, 
-        LogoutViewSet
+    UserViewSet, 
+    SignupViewSet, 
+    LoginViewSet, 
+    LogoutViewSet
 )
 from tweets.api.views import TweetViewSet
 from friendships.api.views import FriendshipViewSet
