@@ -6,5 +6,5 @@ class FriendshipService(object):
     @classmethod
     def get_followers(cls, user):
         friendships = Friendship.objects.filter(to_user=user)
-        followers_id = [friendship.from_user_id for friendship in friendships]
+        follower_ids = [friendship.from_user_id for friendship in friendships]
         return User.objects.filter(id__in=follower_ids)
